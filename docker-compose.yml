@@ -11,13 +11,13 @@ services:
   worker1:
     build: .
     user: nobody
-    command: "celery -A app worker -n worker1 -Q no1 --loglevel=info"
+    command: "celery -A app worker -n worker1@%h -Q no1 --loglevel=info"
     networks:
       - backend_cache
   worker2:
     build: .
     user: nobody
-    command: "celery -A app worker -n worker2 -Q no2 --loglevel=info"
+    command: "celery -A app worker -n worker2@%h -Q no2 --loglevel=info"
     networks:
       - backend_cache
   flower:  

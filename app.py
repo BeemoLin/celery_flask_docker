@@ -2,6 +2,7 @@ from time import sleep
 from flask import Flask
 from flask_restful import Resource, Api
 from celery import Celery
+from celery.signals import worker_ready, worker_shutting_down
 
 def make_celery(app):
     print('create celery app: {}'.format(app.import_name))
@@ -23,8 +24,8 @@ def make_celery(app):
 # create flask app
 flask_app = Flask('app')
 flask_app.config.update(
-    CELERY_BROKER_URL='redis://redis:6379',
-    CELERY_RESULT_BACKEND='redis://redis:6379',
+    CELERY_BROKER_URL='redis://0.0.0.0:6379',
+    CELERY_RESULT_BACKEND='redis://0.0.0.0:6379',
     #CELERY_IMPORTS=['comm.tasks']
 )
 
@@ -39,6 +40,16 @@ api = Api(flask_app)
 def add_together(a, b):
     sleep(10)
     return a + b
+
+@worker_ready.connect
+def worker_ready_handler(sender=None, **kwargs):
+    print('@worker_ready {}'.format(sender))
+    print(celery_app.amqp.queues.keys())
+
+@worker_shutting_down.connect
+def worker_shutting_down_handler(sig, how, exitcode, **kwargs):
+    print('@worker_shutting_down {} {} {}'.format(sig, how, exitcode))
+    print(celery_app.amqp.queues.keys())
 
 # set an API
 class TASK(Resource):
