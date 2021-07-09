@@ -24,8 +24,8 @@ def make_celery(app):
 # create flask app
 flask_app = Flask('app')
 flask_app.config.update(
-    CELERY_BROKER_URL='redis://0.0.0.0:6379',
-    CELERY_RESULT_BACKEND='redis://0.0.0.0:6379',
+    CELERY_BROKER_URL='redis://redis:6379',
+    CELERY_RESULT_BACKEND='redis://redis:6379',
     #CELERY_IMPORTS=['comm.tasks']
 )
 
